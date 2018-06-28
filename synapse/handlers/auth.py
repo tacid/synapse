@@ -852,7 +852,7 @@ class AuthHandler(BaseHandler):
             Deferred(str): Hashed password.
         """
         def _do_hash():
-            return bcrypt.hashpw(password.encode('utf8') + self.hs.config.password_pepper,
+            return bcrypt.hashpw(password + self.hs.config.password_pepper.encode(),
                                  bcrypt.gensalt(self.bcrypt_rounds))
 
         return make_deferred_yieldable(
@@ -874,8 +874,8 @@ class AuthHandler(BaseHandler):
 
         def _do_validate_hash():
             return bcrypt.checkpw(
-                password.encode('utf8') + self.hs.config.password_pepper,
-                stored_hash.encode('utf8')
+                password.encode('utf8') + self.hs.config.password_pepper.encode("ascii"),
+                stored_hash
             )
 
         if stored_hash:

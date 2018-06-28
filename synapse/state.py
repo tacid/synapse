@@ -32,7 +32,7 @@ from frozendict import frozendict
 import logging
 import hashlib
 
-from six import iteritems, itervalues
+from six import itervalues, iteritems
 
 logger = logging.getLogger(__name__)
 
@@ -530,7 +530,7 @@ class StateResolutionHandler(object):
 
 def _ordered_events(events):
     def key_func(e):
-        return -int(e.depth), hashlib.sha1(e.event_id.encode()).hexdigest()
+        return -int(e.depth), hashlib.sha1(e.event_id.encode('ascii')).hexdigest()
 
     return sorted(events, key=key_func)
 

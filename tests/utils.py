@@ -188,7 +188,7 @@ class MockHttpResource(HttpServer):
         self.prefix = prefix
 
     def trigger_get(self, path):
-        return self.trigger("GET", path, None)
+        return self.trigger(b"GET", path, None)
 
     @patch('twisted.web.http.Request')
     @defer.inlineCallbacks
@@ -236,6 +236,9 @@ class MockHttpResource(HttpServer):
         except Exception:
             pass
 
+        if isinstance(path, bytes):
+            path = path.decode('utf8')
+
         for (method, pattern, func) in self.callbacks:
             if http_method != method:
                 continue
@@ -244,7 +247,7 @@ class MockHttpResource(HttpServer):
             if matcher:
                 try:
                     args = [
-                        urlparse.unquote(u).decode("UTF-8")
+                        urlparse.unquote(u)
                         for u in matcher.groups()
                     ]
 

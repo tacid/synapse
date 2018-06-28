@@ -36,6 +36,8 @@ from prometheus_client import Counter
 
 from six import itervalues
 
+from six import itervalues
+
 import logging
 
 
