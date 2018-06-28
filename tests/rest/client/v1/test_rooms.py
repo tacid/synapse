@@ -15,6 +15,8 @@
 
 """Tests REST events for /rooms paths."""
 
+from six import PY3
+
 # twisted imports
 from twisted.internet import defer
 
@@ -919,6 +921,10 @@ class RoomMessagesTestCase(RestTestCase):
 
 class RoomInitialSyncTestCase(RestTestCase):
     """ Tests /rooms/$room_id/initialSync. """
+
+    if PY3:
+        skip = "Deprecated APIs are not being ported to Python 3"
+
     user_id = "@sid1:red"
 
     @defer.inlineCallbacks
@@ -952,6 +958,9 @@ class RoomInitialSyncTestCase(RestTestCase):
         hs.get_datastore().insert_client_ip = _insert_client_ip
 
         synapse.rest.client.v1.room.register_servlets(hs, self.mock_resource)
+        synapse.rest.client.v1.room.register_deprecated_servlets(
+            hs, self.mock_resource
+        )
 
         # create the room
         self.room_id = yield self.create_room_as(self.user_id)

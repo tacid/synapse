@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import json
 
 from twisted.test.proto_helpers import MemoryReactorClock
 
+from six import PY3
 from mock import Mock
 from synapse.http.server import JsonResource
 from synapse.rest.client.v1.register import register_servlets
@@ -31,7 +31,20 @@ class CreateUserServletTestCase(unittest.TestCase):
     Tests for CreateUserRestServlet.
     """
 
+    if PY3:
+        skip = "v1-only APIs not ported to Python 3"
+
     def setUp(self):
+        from synapse.rest.client.v1_only.register import CreateUserRestServlet
+        # do the dance to hook up request data to self.request_data
+        self.request_data = ""
+        self.request = Mock(
+            content=Mock(read=Mock(side_effect=lambda: self.request_data)),
+            path='/_matrix/client/api/v1/createUser'
+        )
+        self.request.args = {}
+        self.request.requestHeaders.getRawHeaders = mock_getRawHeaders()
+
         self.registration_handler = Mock()
 
         self.appservice = Mock(sender="@as:test")
