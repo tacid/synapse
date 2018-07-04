@@ -59,7 +59,7 @@ class FilterTestCase(unittest.TestCase):
 
         def get_user_by_req(request, allow_guest=False, rights="access"):
             return synapse.types.create_requester(
-                UserID.from_string(self.USER_ID), 1, False, None
+                UserID.from_string(self.USER_ID.decode('utf8')), 1, False, None
             )
 
         self.auth.get_user_by_access_token = get_user_by_access_token
