@@ -20,7 +20,6 @@ from twisted.test.proto_helpers import MemoryReactorClock
 from six import PY3
 from mock import Mock
 from synapse.http.server import JsonResource
-from synapse.rest.client.v1.register import register_servlets
 from synapse.util import Clock
 from tests import unittest
 from tests.server import setup_test_homeserver, make_request
