@@ -119,7 +119,7 @@ class FilterTestCase(unittest.TestCase):
             user_localpart="apple", user_filter=self.EXAMPLE_FILTER
         )
         self.clock.advance(1)
-        filter_id = filter_id.result
+        filter_id = str(filter_id.result).encode('utf8')
         request, channel = make_request(
             b"GET", b"/_matrix/client/r0/user/%s/filter/%s" % (self.USER_ID, filter_id)
         )
@@ -131,7 +131,7 @@ class FilterTestCase(unittest.TestCase):
 
     def test_get_filter_non_existant(self):
         request, channel = make_request(
-            b"GET", "/_matrix/client/r0/user/%s/filter/12382148321" % (self.USER_ID)
+            b"GET", b"/_matrix/client/r0/user/%s/filter/12382148321" % (self.USER_ID)
         )
         request.render(self.resource)
         wait_until_result(self.clock, channel)
@@ -143,7 +143,7 @@ class FilterTestCase(unittest.TestCase):
     # in errors.py
     def test_get_filter_invalid_id(self):
         request, channel = make_request(
-            b"GET", "/_matrix/client/r0/user/%s/filter/foobar" % (self.USER_ID)
+            b"GET", b"/_matrix/client/r0/user/%s/filter/foobar" % (self.USER_ID)
         )
         request.render(self.resource)
         wait_until_result(self.clock, channel)
@@ -153,7 +153,7 @@ class FilterTestCase(unittest.TestCase):
     # No ID also returns an invalid_id error
     def test_get_filter_no_id(self):
         request, channel = make_request(
-            b"GET", "/_matrix/client/r0/user/%s/filter/" % (self.USER_ID)
+            b"GET", b"/_matrix/client/r0/user/%s/filter/" % (self.USER_ID)
         )
         request.render(self.resource)
         wait_until_result(self.clock, channel)

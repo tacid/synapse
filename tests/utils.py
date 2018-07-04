@@ -222,7 +222,7 @@ class MockHttpResource(HttpServer):
 
         headers = {}
         if federation_auth:
-            headers[b"Authorization"] = ["X-Matrix origin=test,key=,sig="]
+            headers[b"Authorization"] = [b"X-Matrix origin=test,key=,sig="]
         mock_request.requestHeaders.getRawHeaders = mock_getRawHeaders(headers)
 
         # return the right path if the event requires it

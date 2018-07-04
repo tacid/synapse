@@ -23,7 +23,7 @@ import sys
 from signedjson.key import decode_verify_key_bytes
 from signedjson.sign import verify_signed_json
 import six
-from six.moves import http_client
+from six.moves import http_client, zip
 from six import iteritems
 from twisted.internet import defer
 from unpaddedbase64 import decode_base64
@@ -939,7 +939,7 @@ class FederationHandler(BaseHandler):
         tried_domains = set(likely_domains)
         tried_domains.add(self.server_name)
 
-        event_ids = list(extremities.iterkeys())
+        event_ids = list(extremities.keys())
 
         logger.debug("calling resolve_state_groups in _maybe_backfill")
         resolve = logcontext.preserve_fn(
@@ -1677,7 +1677,7 @@ class FederationHandler(BaseHandler):
         yield self.store.persist_events(
             [
                 (ev_info["event"], context)
-                for ev_info, context in itertools.izip(event_infos, contexts)
+                for ev_info, context in zip(event_infos, contexts)
             ],
             backfilled=backfilled,
         )

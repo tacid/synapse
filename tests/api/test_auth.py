@@ -155,7 +155,7 @@ class AuthTestCase(unittest.TestCase):
 
     @defer.inlineCallbacks
     def test_get_user_by_req_appservice_valid_token_valid_user_id(self):
-        masquerading_user_id = "@doppelganger:matrix.org"
+        masquerading_user_id = b"@doppelganger:matrix.org"
         app_service = Mock(
             token="foobar", url="a_url", sender=self.test_user,
             ip_range_whitelist=None,
@@ -170,10 +170,13 @@ class AuthTestCase(unittest.TestCase):
         request.args[b"user_id"] = [masquerading_user_id]
         request.requestHeaders.getRawHeaders = mock_getRawHeaders()
         requester = yield self.auth.get_user_by_req(request)
-        self.assertEquals(requester.user.to_string(), masquerading_user_id)
+        self.assertEquals(
+            requester.user.to_string(),
+            masquerading_user_id.decode('utf8')
+        )
 
     def test_get_user_by_req_appservice_valid_token_bad_user_id(self):
-        masquerading_user_id = "@doppelganger:matrix.org"
+        masquerading_user_id = b"@doppelganger:matrix.org"
         app_service = Mock(
             token="foobar", url="a_url", sender=self.test_user,
             ip_range_whitelist=None,

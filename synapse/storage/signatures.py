@@ -80,7 +80,7 @@ class SignatureWorkerStore(SQLBaseStore):
             " WHERE event_id = ?"
         )
         txn.execute(query, (event_id, ))
-        if PY2:
+        if six.PY2:
             return {k: v for k, v in txn}
         else:
             done = {}

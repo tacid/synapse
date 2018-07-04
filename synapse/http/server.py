@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import cgi
-from six.moves import http_client
+from six.moves import http_client, urllib
 
 from synapse.api.errors import (
     cs_exception, SynapseError, CodeMessageException, UnrecognizedRequestError, Codes
@@ -40,7 +40,6 @@ from twisted.web.util import redirectTo
 
 import collections
 import logging
-import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -298,7 +297,7 @@ class JsonResource(HttpServer, resource.Resource):
         # installed by @request_handler.
 
         kwargs = intern_dict({
-            name: urllib.unquote(value).decode("UTF-8") if value else value
+            name: urllib.parse.unquote(value) if value else value
             for name, value in group_dict.items()
         })
 
