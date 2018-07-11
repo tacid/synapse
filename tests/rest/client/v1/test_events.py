@@ -18,7 +18,6 @@
 from mock import Mock, NonCallableMock
 from six import PY3
 
-# twisted imports
 from twisted.internet import defer
 
 from ....utils import MockHttpResource, setup_test_homeserver
@@ -31,7 +30,7 @@ class EventStreamPermissionsTestCase(RestTestCase):
     """ Tests event streaming (GET /events). """
 
     if PY3:
-        skip = "Deprecated APIs are not being ported to Python 3."
+        skip = "Skip on Py3 until ported to use not V1 only register."
 
     @defer.inlineCallbacks
     def setUp(self):

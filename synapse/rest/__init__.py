@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2014-2016 OpenMarket Ltd
+# Copyright 2018 New Vector Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +16,14 @@
 
 from six import PY3
 
+from synapse.http.server import JsonResource
 from synapse.rest.client import versions
-from synapse.rest.client.v1 import admin, directory
-from synapse.rest.client.v1 import login as v1_login
 from synapse.rest.client.v1 import (
+    admin,
+    directory,
+    events,
+    initial_sync,
+    login as v1_login,
     logout,
     presence,
     profile,
@@ -70,10 +75,12 @@ class ClientRestResource(JsonResource):
             # "v1" (Python 2 only)
             v1_register.register_servlets(hs, client_resource)
 
-            # Deprecated in r0
-            events.register_servlets(hs, client_resource)
-            initial_sync.register_servlets(hs, client_resource)
-            room.register_deprecated_servlets(hs, client_resource)
+        # Deprecated in r0
+        initial_sync.register_servlets(hs, client_resource)
+        room.register_deprecated_servlets(hs, client_resource)
+
+        # Partially deprecated in r0
+        events.register_servlets(hs, client_resource)
 
         # "v1" + "r0"
         room.register_servlets(hs, client_resource)
