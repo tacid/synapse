@@ -299,7 +299,7 @@ class EventsWorkerStore(SQLBaseStore):
                                 d.errback(exc)
 
                 with PreserveLoggingContext():
-                    self.hs.get_reactor().callFromThread(fire, event_list)
+                    self.hs.get_reactor().callFromThread(fire, event_list, e)
 
     @defer.inlineCallbacks
     def _enqueue_events(self, events, check_redacted=True, allow_rejected=False):

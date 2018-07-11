@@ -12,9 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import itertools
 import logging
 import operator
+
+from six.moves import map
 
 from twisted.internet import defer
 
@@ -218,7 +221,7 @@ def filter_events_for_client(store, user_id, events, is_peeking=False,
         return event
 
     # check each event: gives an iterable[None|EventBase]
-    filtered_events = itertools.imap(allowed, events)
+    filtered_events = map(allowed, events)
 
     # remove the None entries
     filtered_events = filter(operator.truth, filtered_events)

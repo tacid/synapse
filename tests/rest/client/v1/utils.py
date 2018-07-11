@@ -149,12 +149,12 @@ class RestHelper(object):
     def create_room_as(self, room_creator, is_public=True, tok=None):
         temp_id = self.auth_user_id
         self.auth_user_id = room_creator
-        path = b"/_matrix/client/r0/createRoom"
+        path = "/_matrix/client/r0/createRoom"
         content = {}
         if not is_public:
             content["visibility"] = "private"
         if tok:
-            path = path + b"?access_token=%s" % tok.encode('ascii')
+            path = path + "?access_token=%s" % tok
 
         request, channel = make_request(b"POST", path, json.dumps(content).encode('utf8'))
         request.render(self.resource)
@@ -205,7 +205,7 @@ class RestHelper(object):
         data = {"membership": membership}
 
         request, channel = make_request(
-            b"PUT", path.encode('ascii'), json.dumps(data).encode('utf8')
+            b"PUT", path, json.dumps(data).encode('utf8')
         )
 
         request.render(self.resource)

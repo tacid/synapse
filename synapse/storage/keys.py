@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import hashlib
 import six
-from six import PY3
+import logging
 
 from signedjson.key import decode_verify_key_bytes
 

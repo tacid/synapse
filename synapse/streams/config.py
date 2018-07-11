@@ -57,13 +57,13 @@ class PaginationConfig(object):
     def from_request(cls, request, raise_invalid_params=True,
                      default_limit=None):
         def get_param(name, default=None):
-            lst = request.args.get(name, [])
+            lst = request.args.get(name.encode('ascii'), [])
             if len(lst) > 1:
                 raise SynapseError(
                     400, "%s must be specified only once" % (name,)
                 )
             elif len(lst) == 1:
-                return lst[0]
+                return lst[0].decode('ascii')
             else:
                 return default
 

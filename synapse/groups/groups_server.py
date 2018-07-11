@@ -25,8 +25,6 @@ from synapse.types import GroupID, RoomID, UserID, get_domain_from_id
 
 logger = logging.getLogger(__name__)
 
-
-
 # TODO: Allow users to "knock" or simpkly join depending on rules
 # TODO: Federation admin APIs
 # TODO: is_priveged flag to users and is_public to users and rooms

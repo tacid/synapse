@@ -15,13 +15,12 @@
 
 import json
 
-from mock import Mock
 from six import PY3
+from mock import Mock
 
 from twisted.test.proto_helpers import MemoryReactorClock
 
 from synapse.http.server import JsonResource
-from synapse.rest.client.v1.register import register_servlets
 from synapse.util import Clock
 
 from tests import unittest
@@ -32,6 +31,9 @@ class CreateUserServletTestCase(unittest.TestCase):
     """
     Tests for CreateUserRestServlet.
     """
+
+    if PY3:
+        skip = "Legacy APIs not ported to Python 3"
 
     def setUp(self):
         self.registration_handler = Mock()
@@ -52,6 +54,8 @@ class CreateUserServletTestCase(unittest.TestCase):
         self.hs.get_handlers = Mock(return_value=handlers)
 
     def test_POST_createuser_with_valid_user(self):
+
+        from synapse.rest.client.v1_only.register import register_servlets
 
         res = JsonResource(self.hs)
         register_servlets(self.hs, res)
