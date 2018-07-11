@@ -15,8 +15,9 @@
 
 from six import binary_type, text_type
 
-from frozendict import frozendict
 from canonicaljson import json
+from frozendict import frozendict
+
 
 def freeze(o):
     if isinstance(o, dict):

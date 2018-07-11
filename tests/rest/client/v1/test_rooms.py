@@ -18,8 +18,8 @@
 import json
 
 from mock import Mock, NonCallableMock
-from six.moves.urllib import parse as urlparse
 from six import PY3
+from six.moves.urllib import parse as urlparse
 
 # twisted imports
 from twisted.internet import defer

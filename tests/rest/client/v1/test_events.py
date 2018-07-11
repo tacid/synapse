@@ -16,7 +16,6 @@
 """ Tests REST events for /events paths."""
 
 from mock import Mock, NonCallableMock
-
 from six import PY3
 
 # twisted imports

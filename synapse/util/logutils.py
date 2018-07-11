@@ -13,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from six import PY3
 import inspect
 import logging
 import time
 from functools import wraps
 from inspect import getcallargs
+
+from six import PY3
 
 _TIME_FUNC_ID = 0
 

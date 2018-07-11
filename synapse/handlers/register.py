@@ -16,8 +16,9 @@
 """Contains functions for registering clients."""
 import logging
 
-from twisted.internet import defer
 import six
+
+from twisted.internet import defer
 
 from synapse import types
 from synapse.api.errors import (

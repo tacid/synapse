@@ -16,13 +16,13 @@
 
 import logging
 
+from six.moves import urllib
+
 from twisted.internet import defer
 
 from synapse.api.constants import Membership
 from synapse.api.urls import FEDERATION_PREFIX as PREFIX
 from synapse.util.logutils import log_function
-
-from six.moves import urllib
 
 logger = logging.getLogger(__name__)
 
