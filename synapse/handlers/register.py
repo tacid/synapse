@@ -17,6 +17,7 @@
 import logging
 
 from twisted.internet import defer
+import six
 
 from synapse import types
 from synapse.api.errors import (
@@ -145,8 +146,17 @@ class RegistrationHandler(BaseHandler):
             RegistrationError if there was a problem registering.
         """
         password_hash = None
+
+        # Dirty hack: this is sometimes bytes and sometimes string
+        # this encodes it into bytes if necessary
+        if isinstance(password, six.string_types):
+            password = password.encode("utf-8")
+
         if password:
             password_hash = yield self.auth_handler().hash(password)
+
+        # if this breaks the tests, the tests were wrong
+        localpart = localpart.decode("utf-8")
 
         if localpart:
             yield self.check_username(localpart, guest_access_token=guest_access_token)

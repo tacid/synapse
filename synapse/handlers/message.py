@@ -42,6 +42,8 @@ from synapse.visibility import filter_events_for_client
 
 from ._base import BaseHandler
 
+from six import iteritems, itervalues
+
 logger = logging.getLogger(__name__)
 
 

@@ -16,12 +16,15 @@
 from collections import namedtuple
 
 from twisted.internet import defer
+from six.moves import range
 
 from synapse.api.constants import PresenceState
 from synapse.util import batch_iter
 from synapse.util.caches.descriptors import cached, cachedInlineCallbacks, cachedList
 
 from ._base import SQLBaseStore
+
+from six.moves import range
 
 
 class UserPresenceState(namedtuple("UserPresenceState",

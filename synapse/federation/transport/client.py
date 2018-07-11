@@ -15,13 +15,14 @@
 # limitations under the License.
 
 import logging
-import urllib
 
 from twisted.internet import defer
 
 from synapse.api.constants import Membership
 from synapse.api.urls import FEDERATION_PREFIX as PREFIX
 from synapse.util.logutils import log_function
+
+from six.moves import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -948,4 +949,4 @@ def _create_path(prefix, path, *args):
     Returns:
         str
     """
-    return prefix + path % tuple(urllib.quote(arg, "") for arg in args)
+    return prefix + path % tuple(urllib.parse.quote(arg, "") for arg in args)

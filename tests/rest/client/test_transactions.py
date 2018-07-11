@@ -82,7 +82,7 @@ class HttpTransactionCacheTestCase(unittest.TestCase):
             try:
                 yield self.cache.fetch_or_execute(self.mock_key, cb)
             except Exception as e:
-                self.assertEqual(e.message, "boo")
+                self.assertEqual(e.args[0], "boo")
             self.assertIs(LoggingContext.current_context(), test_context)
 
             res = yield self.cache.fetch_or_execute(self.mock_key, cb)
@@ -108,7 +108,7 @@ class HttpTransactionCacheTestCase(unittest.TestCase):
             try:
                 yield self.cache.fetch_or_execute(self.mock_key, cb)
             except Exception as e:
-                self.assertEqual(e.message, "boo")
+                self.assertEqual(e.args[0], "boo")
             self.assertIs(LoggingContext.current_context(), test_context)
 
             res = yield self.cache.fetch_or_execute(self.mock_key, cb)

@@ -251,10 +251,10 @@ class Auth(object):
             if ip_address not in app_service.ip_range_whitelist:
                 defer.returnValue((None, None))
 
-        if "user_id" not in request.args:
+        if b"user_id" not in request.args:
             defer.returnValue((app_service.sender, app_service))
 
-        user_id = request.args["user_id"][0]
+        user_id = request.args[b"user_id"][0].decode('utf8')
         if app_service.sender == user_id:
             defer.returnValue((app_service.sender, app_service))
 
@@ -680,7 +680,7 @@ def has_access_token(request):
     Returns:
         bool: False if no access_token was given, True otherwise.
     """
-    query_params = request.args.get("access_token")
+    query_params = request.args.get(b"access_token")
     auth_headers = request.requestHeaders.getRawHeaders(b"Authorization")
     return bool(query_params) or bool(auth_headers)
 
@@ -700,7 +700,6 @@ def get_access_token_from_request(request, token_not_found_http_status=401):
     Raises:
         AuthError: If there isn't an access_token in the request.
     """
-
     auth_headers = request.requestHeaders.getRawHeaders(b"Authorization")
     query_params = request.args.get(b"access_token")
     if auth_headers:
@@ -718,9 +717,9 @@ def get_access_token_from_request(request, token_not_found_http_status=401):
                 "Too many Authorization headers.",
                 errcode=Codes.MISSING_TOKEN,
             )
-        parts = auth_headers[0].split(" ")
-        if parts[0] == "Bearer" and len(parts) == 2:
-            return parts[1]
+        parts = auth_headers[0].split(b" ")
+        if parts[0] == b"Bearer" and len(parts) == 2:
+            return parts[1].decode('ascii')
         else:
             raise AuthError(
                 token_not_found_http_status,
@@ -736,4 +735,4 @@ def get_access_token_from_request(request, token_not_found_http_status=401):
                 errcode=Codes.MISSING_TOKEN
             )
 
-        return query_params[0]
+        return query_params[0].decode('ascii')

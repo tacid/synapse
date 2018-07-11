@@ -19,7 +19,7 @@ import logging
 from collections import OrderedDict, deque, namedtuple
 from functools import wraps
 
-from six import iteritems, itervalues
+from six import iteritems, itervalues, PY3
 from six.moves import range
 
 from canonicaljson import json
@@ -64,7 +64,10 @@ state_delta_reuse_delta_counter = Counter(
 
 
 def encode_json(json_object):
-    return frozendict_json_encoder.encode(json_object)
+    if PY3:
+        return frozendict_json_encoder.encode(json_object)
+    else:
+        return frozendict_json_encoder.encode(json_object).decode("utf-8")
 
 
 class _EventPeristenceQueue(object):
@@ -983,7 +986,7 @@ class EventsStore(EventsWorkerStore):
 
                 metadata_json = encode_json(
                     event.internal_metadata.get_dict()
-                ).decode("UTF-8")
+                )
 
                 sql = (
                     "UPDATE event_json SET internal_metadata = ?"
@@ -1097,8 +1100,8 @@ class EventsStore(EventsWorkerStore):
                     "room_id": event.room_id,
                     "internal_metadata": encode_json(
                         event.internal_metadata.get_dict()
-                    ).decode("UTF-8"),
-                    "json": encode_json(event_dict(event)).decode("UTF-8"),
+                    ),
+                    "json": encode_json(event_dict(event)),
                 }
                 for event, _ in events_and_contexts
             ],
@@ -1117,7 +1120,7 @@ class EventsStore(EventsWorkerStore):
                     "type": event.type,
                     "processed": True,
                     "outlier": event.internal_metadata.is_outlier(),
-                    "content": encode_json(event.content).decode("UTF-8"),
+                    "content": encode_json(event.content),
                     "origin_server_ts": int(event.origin_server_ts),
                     "received_ts": self._clock.time_msec(),
                     "sender": event.sender,

@@ -194,15 +194,15 @@ class RegisterRestServlet(RestServlet):
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
 
-        kind = "user"
-        if "kind" in request.args:
-            kind = request.args["kind"][0]
+        kind = b"user"
+        if b"kind" in request.args:
+            kind = request.args[b"kind"][0]
 
-        if kind == "guest":
+        if kind == b"guest":
             ret = yield self._do_guest_registration(body)
             defer.returnValue(ret)
             return
-        elif kind != "user":
+        elif kind != b"user":
             raise UnrecognizedRequestError(
                 "Do not understand membership kind: %s" % (kind,)
             )
@@ -643,7 +643,7 @@ class RegisterRestServlet(RestServlet):
     @defer.inlineCallbacks
     def _do_guest_registration(self, params):
         if not self.hs.config.allow_guest_access:
-            defer.returnValue((403, "Guest access is disabled"))
+            raise SynapseError(403, "Guest access is disabled")
         user_id, _ = yield self.registration_handler.register(
             generate_token=False,
             make_guest=True

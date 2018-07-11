@@ -25,6 +25,8 @@ from synapse.types import GroupID, RoomID, UserID, get_domain_from_id
 
 logger = logging.getLogger(__name__)
 
+from six import string_types
+
 
 # TODO: Allow users to "knock" or simpkly join depending on rules
 # TODO: Federation admin APIs
