@@ -13,10 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
-import urllib
+
+import treq
 
 from six import StringIO
+from six.moves import urllib
 
 from canonicaljson import encode_canonical_json, json
 from prometheus_client import Counter
@@ -95,11 +98,11 @@ class SimpleHttpClient(object):
         outgoing_requests_counter.labels(method).inc()
 
         # log request but strip `access_token` (AS requests for example include this)
-        logger.info("Sending request %s %s", method, redact_uri(uri))
+        logger.info("Sending request %s %s", method, redact_uri(uri.encode('ascii')))
 
         try:
-            request_deferred = self.agent.request(
-                method, uri, *args, **kwargs
+            request_deferred = treq.request(
+                method, uri, *args, agent=self.agent, **kwargs
             )
             add_timeout_to_deferred(
                 request_deferred, 60, self.hs.get_reactor(),
@@ -110,14 +113,14 @@ class SimpleHttpClient(object):
             incoming_responses_counter.labels(method, response.code).inc()
             logger.info(
                 "Received response to  %s %s: %s",
-                method, redact_uri(uri), response.code
+                method, redact_uri(uri.encode('ascii')), response.code
             )
             defer.returnValue(response)
         except Exception as e:
             incoming_responses_counter.labels(method, "ERR").inc()
             logger.info(
                 "Error sending request to  %s %s: %s %s",
-                method, redact_uri(uri), type(e).__name__, e.message
+                method, redact_uri(uri.encode('ascii')), type(e).__name__, e.args[0]
             )
             raise
 
@@ -137,7 +140,7 @@ class SimpleHttpClient(object):
         # TODO: Do we ever want to log message contents?
         logger.debug("post_urlencoded_get_json args: %s", args)
 
-        query_bytes = urllib.urlencode(encode_urlencode_args(args), True)
+        query_bytes = urllib.parse.urlencode(encode_urlencode_args(args), True)
 
         actual_headers = {
             b"Content-Type": [b"application/x-www-form-urlencoded"],
@@ -148,14 +151,14 @@ class SimpleHttpClient(object):
 
         response = yield self.request(
             "POST",
-            uri.encode("ascii"),
+            uri,
             headers=Headers(actual_headers),
             bodyProducer=FileBodyProducer(StringIO(query_bytes))
         )
 
-        body = yield make_deferred_yieldable(readBody(response))
+        body = yield make_deferred_yieldable(treq.json_content(response))
 
-        defer.returnValue(json.loads(body))
+        defer.returnValue(body)
 
     @defer.inlineCallbacks
     def post_json_get_json(self, uri, post_json, headers=None):
@@ -183,9 +186,9 @@ class SimpleHttpClient(object):
 
         response = yield self.request(
             "POST",
-            uri.encode("ascii"),
+            uri,
             headers=Headers(actual_headers),
-            bodyProducer=FileBodyProducer(StringIO(json_str))
+            data=json_str
         )
 
         body = yield make_deferred_yieldable(readBody(response))
@@ -242,7 +245,7 @@ class SimpleHttpClient(object):
             On a non-2xx HTTP response.
         """
         if len(args):
-            query_bytes = urllib.urlencode(args, True)
+            query_bytes = urllib.parse.urlencode(args, True)
             uri = "%s?%s" % (uri, query_bytes)
 
         json_str = encode_canonical_json(json_body)
@@ -256,9 +259,9 @@ class SimpleHttpClient(object):
 
         response = yield self.request(
             "PUT",
-            uri.encode("ascii"),
+            uri,
             headers=Headers(actual_headers),
-            bodyProducer=FileBodyProducer(StringIO(json_str))
+            data=json_str
         )
 
         body = yield make_deferred_yieldable(readBody(response))
@@ -291,7 +294,7 @@ class SimpleHttpClient(object):
             error message.
         """
         if len(args):
-            query_bytes = urllib.urlencode(args, True)
+            query_bytes = urllib.parse.urlencode(args, True)
             uri = "%s?%s" % (uri, query_bytes)
 
         actual_headers = {
@@ -302,7 +305,7 @@ class SimpleHttpClient(object):
 
         response = yield self.request(
             "GET",
-            uri.encode("ascii"),
+            uri,
             headers=Headers(actual_headers),
         )
 
@@ -346,7 +349,7 @@ class SimpleHttpClient(object):
 
         response = yield self.request(
             "GET",
-            url.encode("ascii"),
+            url,
             headers=Headers(actual_headers),
         )
 
@@ -441,12 +444,12 @@ class CaptchaServerHttpClient(SimpleHttpClient):
 
     @defer.inlineCallbacks
     def post_urlencoded_get_raw(self, url, args={}):
-        query_bytes = urllib.urlencode(encode_urlencode_args(args), True)
+        query_bytes = urllib.parse.urlencode(encode_urlencode_args(args), True)
 
         response = yield self.request(
             "POST",
-            url.encode("ascii"),
-            bodyProducer=FileBodyProducer(StringIO(query_bytes)),
+            url,
+            data=query_bytes,
             headers=Headers({
                 b"Content-Type": [b"application/x-www-form-urlencoded"],
                 b"User-Agent": [self.user_agent],

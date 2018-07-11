@@ -1126,7 +1126,7 @@ class EventsStore(EventsWorkerStore):
                     "sender": event.sender,
                     "contains_url": (
                         "url" in event.content
-                        and isinstance(event.content["url"], basestring)
+                        and isinstance(event.content["url"], str)
                     ),
                 }
                 for event, _ in events_and_contexts
@@ -1517,7 +1517,7 @@ class EventsStore(EventsWorkerStore):
 
                     contains_url = "url" in content
                     if contains_url:
-                        contains_url &= isinstance(content["url"], basestring)
+                        contains_url &= isinstance(content["url"], str)
                 except (KeyError, AttributeError):
                     # If the event is missing a necessary field then
                     # skip over it.

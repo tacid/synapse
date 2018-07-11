@@ -90,8 +90,8 @@ class Authenticator(object):
     @defer.inlineCallbacks
     def authenticate_request(self, request, content):
         json_request = {
-            "method": request.method,
-            "uri": request.uri,
+            "method": request.method.decode('ascii'),
+            "uri": request.uri.decode('ascii'),
             "destination": self.server_name,
             "signatures": {},
         }
@@ -205,7 +205,7 @@ class BaseFederationServlet(object):
         @functools.wraps(func)
         def new_func(request, *args, **kwargs):
             content = None
-            if request.method in ["PUT", "POST"]:
+            if request.method in [b"PUT", b"POST"]:
                 # TODO: Handle other method types? other content types?
                 content = parse_json_object_from_request(request)
 
@@ -377,7 +377,7 @@ class FederationQueryServlet(BaseFederationServlet):
     def on_GET(self, origin, content, query, query_type):
         return self.handler.on_query_request(
             query_type,
-            {k: v[0].decode("utf-8") for k, v in query.items()}
+            {k.decode('utf8'): v[0].decode("utf-8") for k, v in query.items()}
         )
 
 

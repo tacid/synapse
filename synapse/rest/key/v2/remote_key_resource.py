@@ -207,10 +207,10 @@ class RemoteKey(Resource):
 
                 if miss:
                     cache_misses.setdefault(server_name, set()).add(key_id)
-                json_results.add(bytes(most_recent_result["key_json"]))
+                json_results.add(most_recent_result["key_json"].encode('ascii'))
             else:
                 for ts_added, result in results:
-                    json_results.add(bytes(result["key_json"]))
+                    json_results.add(result["key_json"].encode('ascii'))
 
         if cache_misses and query_remote_on_cache_miss:
             for server_name, key_ids in cache_misses.items():

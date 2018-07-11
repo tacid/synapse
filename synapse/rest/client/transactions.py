@@ -53,11 +53,7 @@ class HttpTransactionCache(object):
             str: A transaction key
         """
         token = self.auth.get_access_token_from_request(request)
-        transaction_key =  request.path + b"/" + token
-
-        if isinstance(transaction_key, str):
-            return transaction_key.decode('utf8')
-
+        transaction_key = request.path.decode() + "/" + token
         return transaction_key
 
     def fetch_or_execute_request(self, request, fn, *args, **kwargs):

@@ -48,7 +48,7 @@ def fetch_server_key(server_name, ssl_context_factory, path=KEY_API_V1):
                 defer.returnValue((server_response, server_certificate))
         except SynapseKeyClientError as e:
             logger.exception("Error getting key for %r" % (server_name,))
-            if e.status.startswith("4"):
+            if e.status.startswith(b"4"):
                 # Don't retry for 4xx responses.
                 raise IOError("Cannot get key for %r" % server_name)
         except Exception as e:

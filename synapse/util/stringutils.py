@@ -16,6 +16,7 @@
 import random
 import string
 
+from six import PY3
 from six.moves import range
 
 _string_with_symbols = (
@@ -43,16 +44,22 @@ def is_ascii(s):
     else:
         return True
 
-
-def to_ascii(s):
-    """Converts a string to ascii if it is ascii, otherwise leave it alone.
-
-    If given None then will return None.
-    """
-    if s is None:
-        return None
-
-    try:
-        return s.encode("ascii")
-    except UnicodeEncodeError:
+if PY3:
+    def to_ascii(s):
+        """
+        Python will shrink things into ASCII if it can.
+        """
         return s
+else:
+    def to_ascii(s):
+        """Converts a string to ascii if it is ascii, otherwise leave it alone.
+
+        If given None then will return None.
+        """
+        if s is None:
+            return None
+
+        try:
+            return s.encode("ascii")
+        except UnicodeEncodeError:
+            return s

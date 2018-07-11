@@ -74,7 +74,7 @@ class RoomBase(unittest.TestCase):
 
         self.hs.get_auth().get_user_by_req = get_user_by_req
         self.hs.get_auth().get_user_by_access_token = get_user_by_access_token
-        self.hs.get_auth().get_access_token_from_request = Mock(return_value=b"1234")
+        self.hs.get_auth().get_access_token_from_request = Mock(return_value="1234")
 
         def _insert_client_ip(*args, **kwargs):
             return defer.succeed(None)
