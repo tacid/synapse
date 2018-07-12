@@ -216,8 +216,8 @@ class MockHttpResource(HttpServer):
         mock_content.configure_mock(**config)
         mock_request.content = mock_content
 
-        mock_request.method = http_method
-        mock_request.uri = path
+        mock_request.method = http_method.encode('ascii')
+        mock_request.uri = path.encode('ascii')
 
         mock_request.getClientIP.return_value = "-"
 
