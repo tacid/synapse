@@ -16,7 +16,6 @@
 import logging
 
 from synapse.api.errors import SynapseError
-from synapse.http.servlet import parse_integer, parse_string
 from synapse.types import StreamToken
 
 logger = logging.getLogger(__name__)
@@ -57,10 +56,23 @@ class PaginationConfig(object):
     @classmethod
     def from_request(cls, request, raise_invalid_params=True,
                      default_limit=None):
-        direction = parse_string(request, "dir", default='f', allowed_values=['f', 'b'])
+        def get_param(name, default=None):
+            lst = request.args.get(name, [])
+            if len(lst) > 1:
+                raise SynapseError(
+                    400, "%s must be specified only once" % (name,)
+                )
+            elif len(lst) == 1:
+                return lst[0]
+            else:
+                return default
 
-        from_tok = parse_string(request, "from")
-        to_tok = parse_string(request, "to")
+        direction = get_param("dir", 'f')
+        if direction not in ['f', 'b']:
+            raise SynapseError(400, "'dir' parameter is invalid.")
+
+        from_tok = get_param("from")
+        to_tok = get_param("to")
 
         try:
             if from_tok == "END":
@@ -76,7 +88,12 @@ class PaginationConfig(object):
         except Exception:
             raise SynapseError(400, "'to' paramater is invalid")
 
-        limit = parse_integer(request, "limit", default=default_limit)
+        limit = get_param("limit", None)
+        if limit is not None and not limit.isdigit():
+            raise SynapseError(400, "'limit' parameter must be an integer.")
+
+        if limit is None:
+            limit = default_limit
 
         try:
             return PaginationConfig(from_tok, to_tok, direction, limit)

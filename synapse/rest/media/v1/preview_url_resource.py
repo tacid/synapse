@@ -40,7 +40,6 @@ from synapse.http.server import (
     respond_with_json_bytes,
     wrap_json_request_handler,
 )
-from synapse.http.servlet import parse_integer, parse_string
 from synapse.util.async import ObservableDeferred
 from synapse.util.caches.expiringcache import ExpiringCache
 from synapse.util.logcontext import make_deferred_yieldable, run_in_background
@@ -97,9 +96,9 @@ class PreviewUrlResource(Resource):
 
         # XXX: if get_user_by_req fails, what should we do in an async render?
         requester = yield self.auth.get_user_by_req(request)
-        url = parse_string(request, "url")
+        url = request.args.get("url")[0]
         if "ts" in request.args:
-            ts = parse_integer(request, "ts")
+            ts = int(request.args.get("ts")[0])
         else:
             ts = self.clock.time_msec()
 

@@ -16,7 +16,6 @@
 from twisted.internet import defer
 
 from synapse.streams.config import PaginationConfig
-from synapse.http.servlet import parse_boolean
 
 from .base import ClientV1RestServlet, client_path_patterns
 
@@ -34,7 +33,7 @@ class InitialSyncRestServlet(ClientV1RestServlet):
         requester = yield self.auth.get_user_by_req(request)
         as_client_event = "raw" not in request.args
         pagination_config = PaginationConfig.from_request(request)
-        include_archived = parse_boolean(request, "archived", default=False)
+        include_archived = request.args.get("archived", None) == ["true"]
         content = yield self.initial_sync_handler.snapshot_all_rooms(
             user_id=requester.user.to_string(),
             pagin_config=pagination_config,

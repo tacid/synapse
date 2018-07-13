@@ -24,7 +24,7 @@ from synapse.api.constants import LoginType
 from synapse.api.errors import Codes, SynapseError
 from synapse.http.servlet import (
     RestServlet,
-    assert_params_in_dict,
+    assert_params_in_request,
     parse_json_object_from_request,
 )
 from synapse.util.msisdn import phone_number_to_msisdn
@@ -47,7 +47,7 @@ class EmailPasswordRequestTokenRestServlet(RestServlet):
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
 
-        assert_params_in_dict(body, [
+        assert_params_in_request(body, [
             'id_server', 'client_secret', 'email', 'send_attempt'
         ])
 
@@ -80,7 +80,7 @@ class MsisdnPasswordRequestTokenRestServlet(RestServlet):
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
 
-        assert_params_in_dict(body, [
+        assert_params_in_request(body, [
             'id_server', 'client_secret',
             'country', 'phone_number', 'send_attempt',
         ])
@@ -159,10 +159,11 @@ class PasswordRestServlet(RestServlet):
                     raise SynapseError(404, "Email address not found", Codes.NOT_FOUND)
                 user_id = threepid_user_id
             else:
-                logger.error("Auth succeeded but no known type! %r", result.keys())
+                logger.error("Auth succeeded but no known type!", result.keys())
                 raise SynapseError(500, "", Codes.UNKNOWN)
 
-        assert_params_in_dict(params, ["new_password"])
+        if 'new_password' not in params:
+            raise SynapseError(400, "", Codes.MISSING_PARAM)
         new_password = params['new_password']
 
         yield self._set_password_handler.set_password(
@@ -227,10 +228,15 @@ class EmailThreepidRequestTokenRestServlet(RestServlet):
     @defer.inlineCallbacks
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
-        assert_params_in_dict(
-            body,
-            ['id_server', 'client_secret', 'email', 'send_attempt'],
-        )
+
+        required = ['id_server', 'client_secret', 'email', 'send_attempt']
+        absent = []
+        for k in required:
+            if k not in body:
+                absent.append(k)
+
+        if absent:
+            raise SynapseError(400, "Missing params: %r" % absent, Codes.MISSING_PARAM)
 
         if not check_3pid_allowed(self.hs, "email", body['email']):
             raise SynapseError(
@@ -260,10 +266,18 @@ class MsisdnThreepidRequestTokenRestServlet(RestServlet):
     @defer.inlineCallbacks
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
-        assert_params_in_dict(body, [
+
+        required = [
             'id_server', 'client_secret',
             'country', 'phone_number', 'send_attempt',
-        ])
+        ]
+        absent = []
+        for k in required:
+            if k not in body:
+                absent.append(k)
+
+        if absent:
+            raise SynapseError(400, "Missing params: %r" % absent, Codes.MISSING_PARAM)
 
         msisdn = phone_number_to_msisdn(body['country'], body['phone_number'])
 
@@ -358,7 +372,15 @@ class ThreepidDeleteRestServlet(RestServlet):
     @defer.inlineCallbacks
     def on_POST(self, request):
         body = parse_json_object_from_request(request)
-        assert_params_in_dict(body, ['medium', 'address'])
+
+        required = ['medium', 'address']
+        absent = []
+        for k in required:
+            if k not in body:
+                absent.append(k)
+
+        if absent:
+            raise SynapseError(400, "Missing params: %r" % absent, Codes.MISSING_PARAM)
 
         requester = yield self.auth.get_user_by_req(request)
         user_id = requester.user.to_string()
